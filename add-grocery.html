@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Grocery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+CO+Guides&family=Playwrite+DE+VA+Guides&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Inline CSS for responsive grid layout */
+      body {
+        background-color: #fcf4e5;
+        font-family: Rockwell;
+      }
+      /* Banner styling */
+      .banner {
+        background-color: #f5f3dc; /* Adjust to your desired color */
+        color: #fff; /* Ensure the text is visible against the background */
+        padding: 20px 0; /* Add space around the text */
+        text-align: center; /* Center-align the text */
+        border-radius: 10px; /* Optional: Add rounded corners */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+        margin-bottom: 20px; /* Add spacing below the banner */
+      }
+
+      .banner h1 {
+        margin: 0; /* Remove default margin */
+        font-size: 2em; /* Adjust text size as needed */
+        font-family: "Playwrite CO Guides", serif; /* Match existing font styles */
+      }
+
+      h1 {
+        text-align: center;
+        font-family: "Playwrite CO Guides", serif;
+        font-weight: 400;
+        font-style: normal;
+        margin: 20px 0;
+        color: #0d105c;
+      }
+      #groc-name-font {
+        font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+          sans-serif;
+      }
+      #grocery-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        padding: 0;
+        list-style: none;
+      }
+      #add-groc {
+        background-color: #e07b39;
+      }
+
+      #grocery-list li {
+        background-color: #dce4c9;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      #grocery-list button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+
+      #grocery-list button:hover {
+        background-color: #ff1a1a;
+      }
+
+      @media (max-width: 600px) {
+        #grocery-list {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="banner">
+      <h1>Add a Grocery Item 🛒</h1>
+    </header>
+
+    <!-- Form for adding grocery -->
+    <form id="add-grocery-form">
+      <label for="grocery-input" id="groc-name-font">Grocery Name:</label>
+      <input
+        type="text"
+        id="grocery-input"
+        placeholder="Enter grocery name"
+        required
+      />
+      <button type="submit" id="add-groc">Add Grocery</button>
+    </form>
+
+    <!-- Display list of groceries -->
+    <h2>Grocery List</h2>
+    <ul id="grocery-list">
+      <!-- Dynamic list of groceries will appear here -->
+    </ul>
+
+    <!-- Back to home button -->
+    <a href="index.html"><button>Back to Home</button></a>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const groceryForm = document.getElementById("add-grocery-form");
+        const groceryInput = document.getElementById("grocery-input");
+        const groceryList = document.getElementById("grocery-list");
+
+        // Function to load groceries from localStorage and display them
+        function loadGroceries() {
+          groceryList.innerHTML = ""; // Clear the list
+          const groceries = JSON.parse(localStorage.getItem("groceries")) || [];
+
+          groceries.forEach((item, index) => {
+            const listItem = document.createElement("li");
+
+            const itemLabel = document.createElement("span");
+            itemLabel.textContent = item;
+
+            // Create delete button for each item
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "X";
+            deleteButton.onclick = () => deleteGrocery(index);
+
+            listItem.appendChild(itemLabel);
+            listItem.appendChild(deleteButton);
+            groceryList.appendChild(listItem);
+          });
+        }
+
+        // Function to add a new grocery item
+        function addGrocery(event) {
+          event.preventDefault(); // Prevent page reload
+
+          const groceryName = groceryInput.value.trim();
+
+          if (groceryName) {
+            let groceries = JSON.parse(localStorage.getItem("groceries")) || [];
+            groceries.push(groceryName); // Add new item
+            localStorage.setItem("groceries", JSON.stringify(groceries));
+
+            groceryInput.value = ""; // Clear input field
+            loadGroceries(); // Refresh the list
+          }
+        }
+
+        // Function to delete a grocery item
+        function deleteGrocery(index) {
+          let groceries = JSON.parse(localStorage.getItem("groceries")) || [];
+          groceries.splice(index, 1); // Remove item at the given index
+          localStorage.setItem("groceries", JSON.stringify(groceries));
+          loadGroceries(); // Refresh the list
+        }
+
+        // Event listener for form submission
+        groceryForm.addEventListener("submit", addGrocery);
+
+        // Load groceries on page load
+        loadGroceries();
+      });
+    </script>
+  </body>
+</html>

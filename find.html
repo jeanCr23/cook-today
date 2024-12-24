@@ -1,0 +1,297 @@
+<!--Find Recipe-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Recipe</title>
+    <!-- <link rel="stylesheet" href="style.css" /> -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+CO+Guides&family=Playwrite+DE+VA+Guides&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: Rockwell;
+        /* margin: 10px; */
+        padding: 30px;
+        background-color: #dce4c9;
+        color: #333;
+        line-height: 1.6;
+        font-size: 1.25em;
+      }
+
+      /* Header */
+      h1 {
+        text-align: center;
+        font-family: "Playwrite CO Guides", serif;
+        font-weight: 400;
+        font-style: normal;
+        margin: 20px 0;
+        color: #0d105c;
+      }
+      /* Banner styling */
+      .banner {
+        background-color: #f5f5dc; /* Adjust to your desired color */
+        color: #fff; /* Ensure the text is visible against the background */
+        padding: 20px 0; /* Add space around the text */
+        text-align: center; /* Center-align the text */
+        border-radius: 10px; /* Optional: Add rounded corners */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+        margin-bottom: 20px; /* Add spacing below the banner */
+      }
+
+      .banner h1 {
+        margin: 0; /* Remove default margin */
+        font-size: 2em; /* Adjust text size as needed */
+        font-family: "Playwrite CO Guides", serif; /* Match existing font styles */
+      }
+
+      /* Buttons */
+      #back-to-home-btn {
+        background-color: #3998e0;
+      }
+      button {
+        background-color: #e07b39;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 15px;
+        margin: 10px 0;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      button:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+      }
+      /* Form Styles */
+      #find-recipe-form {
+        margin: 0 auto;
+        padding: 20px;
+        background: #fcf4e5;
+      }
+
+      #type-of-dish-select {
+        margin: 8px 0;
+        padding: 20px;
+      }
+
+      /* Update styles for ingredient options */
+      #central-ingredient-options label,
+      #other-ingredients-options label {
+        display: flex;
+        align-items: center; /* Ensures alignment between input and text */
+        justify-content: flex-start; /* Aligns text closer to the checkbox/radio */
+        gap: 8px; /* Reduced space between input and label text */
+        background-color: #c9e4d1;
+        color: #21236c;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        line-height: 1.4; /* Improves overall text readability */
+      }
+
+      #central-ingredient-options,
+      #other-ingredients-options {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(200px, 1fr)
+        ); /* Larger minimum width for consistent layout */
+        gap: 15px; /* Adjust spacing for better layout */
+      }
+
+      /* Adjustments for smaller screens */
+      @media (max-width: 768px) {
+        #central-ingredient-options,
+        #other-ingredients-options {
+          grid-template-columns: repeat(
+            auto-fit,
+            minmax(120px, 1fr)
+          ); /* Narrower columns on small screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="banner">
+      <h1>Find a recipe 🔎</h1>
+    </header>
+
+    <form id="find-recipe-form">
+      <!-- Type of Dish -->
+      <label for="type-of-dish">Type of Dish:</label>
+      <select id="type-of-dish-select" required>
+        <option value="" disabled selected>Select type</option>
+        <option value="Main Dish">Main Dish</option>
+        <option value="Side Dish">Side Dish</option>
+        <option value="Snack/Dessert/Breakfast">Snack/Dessert/Breakfast</option>
+      </select>
+      <br />
+
+      <!-- Central Ingredient -->
+      <label>Central Ingredient:</label>
+      <div id="central-ingredient-options">
+        <!-- Radio buttons for central ingredients will be added dynamically -->
+      </div>
+      <br />
+
+      <!-- Other Ingredients -->
+      <label>Other Ingredients:</label>
+      <div id="other-ingredients-options">
+        <!-- Checkboxes for other ingredients will be added dynamically -->
+      </div>
+      <br />
+
+      <button type="submit">Find Recipes</button>
+    </form>
+
+    <h2>Results:</h2>
+    <ul id="recipe-results">
+      <!-- Filtered recipes will appear here -->
+    </ul>
+
+    <a href="index.html"><button id="back-to-home-btn">Back to Home</button></a>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const findRecipeForm = document.getElementById("find-recipe-form");
+        const centralIngredientOptions = document.getElementById(
+          "central-ingredient-options"
+        );
+        const otherIngredientsOptions = document.getElementById(
+          "other-ingredients-options"
+        );
+        const recipeResults = document.getElementById("recipe-results");
+
+        // Load groceries from localStorage
+        function loadGroceries() {
+          const groceries = JSON.parse(localStorage.getItem("groceries")) || [];
+
+          // Clear existing options
+          centralIngredientOptions.innerHTML = "";
+          otherIngredientsOptions.innerHTML = "";
+
+          // Populate central ingredient options (radio buttons)
+          groceries.forEach((grocery, index) => {
+            const radioInput = document.createElement("input");
+            radioInput.type = "radio";
+            radioInput.name = "central-ingredient";
+            radioInput.value = grocery;
+            radioInput.id = `central-${index}`;
+
+            const label = document.createElement("label");
+            label.htmlFor = `central-${index}`;
+            label.textContent = grocery;
+
+            centralIngredientOptions.appendChild(radioInput);
+            centralIngredientOptions.appendChild(label);
+            centralIngredientOptions.appendChild(document.createElement("br"));
+          });
+
+          // Populate other ingredients options (checkboxes)
+          groceries.forEach((grocery, index) => {
+            const checkboxInput = document.createElement("input");
+            checkboxInput.type = "checkbox";
+            checkboxInput.name = "other-ingredients";
+            checkboxInput.value = grocery;
+            checkboxInput.id = `other-${index}`;
+
+            const label = document.createElement("label");
+            label.htmlFor = `other-${index}`;
+            label.textContent = grocery;
+
+            otherIngredientsOptions.appendChild(checkboxInput);
+            otherIngredientsOptions.appendChild(label);
+            otherIngredientsOptions.appendChild(document.createElement("br"));
+          });
+        }
+
+        // Display filtered recipes
+        function displayRecipes(recipes) {
+          recipeResults.innerHTML = ""; // Clear previous results
+
+          if (recipes.length === 0) {
+            recipeResults.textContent = "No recipes found.";
+            return;
+          }
+
+          recipes.forEach((recipe) => {
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `
+              <strong>${recipe.name}</strong><br />
+              Type of Dish: ${recipe.typeOfDish}<br />
+              Central Ingredient: ${recipe.centralIngredient}<br />
+              Other Ingredients: ${recipe.otherIngredients.join(", ")}<br />
+              ${
+                recipe.recipeLink
+                  ? `<a href="${recipe.recipeLink}" target="_blank">View Recipe</a>`
+                  : "No link provided"
+              }
+            `;
+            recipeResults.appendChild(listItem);
+          });
+        }
+
+        // Find matching recipes
+        function findRecipes(event) {
+          event.preventDefault();
+
+          const typeOfDish = document.getElementById(
+            "type-of-dish-select"
+          ).value;
+          const centralIngredient = document.querySelector(
+            "input[name='central-ingredient']:checked"
+          )?.value;
+          const otherIngredients = Array.from(
+            document.querySelectorAll("input[name='other-ingredients']:checked")
+          ).map((checkbox) => checkbox.value);
+
+          if (!typeOfDish || !centralIngredient) {
+            alert("Please fill in all required fields.");
+            return;
+          }
+
+          // Fetch recipes from localStorage
+          const recipes = JSON.parse(localStorage.getItem("recipes")) || [];
+
+          // Filter recipes
+          const filteredRecipes = recipes
+            .filter(
+              (recipe) =>
+                recipe.typeOfDish === typeOfDish &&
+                recipe.centralIngredient === centralIngredient
+            )
+            .sort((a, b) => {
+              // Sort by the number of matching other ingredients
+              const aMatchCount = a.otherIngredients.filter((ingredient) =>
+                otherIngredients.includes(ingredient)
+              ).length;
+              const bMatchCount = b.otherIngredients.filter((ingredient) =>
+                otherIngredients.includes(ingredient)
+              ).length;
+              return bMatchCount - aMatchCount;
+            });
+
+          // Display results
+          displayRecipes(filteredRecipes);
+        }
+
+        // Event listener for form submission
+        findRecipeForm.addEventListener("submit", findRecipes);
+
+        // Load groceries on page load
+        loadGroceries();
+      });
+    </script>
+  </body>
+</html>

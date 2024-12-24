@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Recipe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+CO+Guides&family=Playwrite+DE+VA+Guides&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- <link rel="stylesheet" href="style.css" /> -->
+    <style>
+      body {
+        font-family: Rockwell;
+        /* margin: 10px; */
+        padding: 30px;
+        background-color: #dce4c9;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      /* Banner styling */
+      .banner {
+        background-color: #f5f5dc; /* Adjust to your desired color */
+        color: #fff; /* Ensure the text is visible against the background */
+        padding: 20px 0; /* Add space around the text */
+        text-align: center; /* Center-align the text */
+        border-radius: 10px; /* Optional: Add rounded corners */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+        margin-bottom: 20px; /* Add spacing below the banner */
+      }
+
+      .banner h1 {
+        margin: 0; /* Remove default margin */
+        font-size: 2em; /* Adjust text size as needed */
+        font-family: "Playwrite CO Guides", serif; /* Match existing font styles */
+      }
+
+      /* Header */
+      h1 {
+        text-align: center;
+        font-family: "Playwrite CO Guides", serif;
+        font-weight: 400;
+        font-style: normal;
+        margin: 20px 0;
+        color: #0d105c;
+      }
+
+      /* Buttons */
+      button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 15px;
+        margin: 10px 0;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      button:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+      }
+      /* Form Styles */
+      #hr {
+        color: #b6a28e;
+      }
+      form {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #fcf4e5;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      #save-recipe-btn {
+        background-color: #e07b39;
+      }
+
+      #central-font,
+      #other-font {
+        font-family: "Courier New", Courier, monospace;
+      }
+
+      #recipe-font,
+      #type-of-dish-font {
+        font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+          sans-serif;
+      }
+
+      #central-ingredient-options,
+      #other-ingredients-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+      }
+
+      #central-ingredient-options label,
+      #other-ingredients-options label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background-color: #c9e4e1;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+
+      @media (max-width: 600px) {
+        #central-ingredient-options,
+        #other-ingredients-options {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="banner">
+      <h1>Create a Recipe 🖋️</h1>
+    </header>
+
+    <form id="create-recipe-form">
+      <!-- Recipe Name -->
+      <label for="recipe-name" id="recipe-font">Recipe Name:</label>
+      <input
+        type="text"
+        id="recipe-name"
+        placeholder="Enter recipe name"
+        required
+      />
+      <br />
+
+      <!-- Type of Dish -->
+      <label for="type-of-dish" id="type-of-dish-font">Type of Dish:</label>
+      <select id="type-of-dish" required>
+        <option value="" disabled selected>Select type</option>
+        <option value="Main Dish">Main Dish</option>
+        <option value="Side Dish">Side Dish</option>
+        <option value="Snack/Dessert/Breakfast">Snack/Dessert/Breakfast</option>
+      </select>
+      <hr id="hr" />
+      <br />
+      <!-- Central Ingredient -->
+      <label id="central-font">Central Ingredient:</label>
+      <div id="central-ingredient-options"></div>
+      <br />
+
+      <!-- Other Ingredients -->
+      <label id="other-font">Other Ingredients:</label>
+      <div id="other-ingredients-options"></div>
+      <br />
+
+      <!-- Recipe Link -->
+      <label for="recipe-link">Recipe Link (optional):</label>
+      <input type="url" id="recipe-link" placeholder="Enter recipe link" />
+      <br />
+
+      <button type="submit" id="save-recipe-btn">Save Recipe</button>
+    </form>
+
+    <a href="index.html"><button>Back to Home</button></a>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const createRecipeForm = document.getElementById("create-recipe-form");
+        const centralIngredientOptions = document.getElementById(
+          "central-ingredient-options"
+        );
+        const otherIngredientsOptions = document.getElementById(
+          "other-ingredients-options"
+        );
+
+        function loadGroceries() {
+          const groceries = JSON.parse(localStorage.getItem("groceries")) || [];
+          centralIngredientOptions.innerHTML = "";
+          otherIngredientsOptions.innerHTML = "";
+
+          groceries.forEach((grocery, index) => {
+            const centralLabel = document.createElement("label");
+            const centralRadio = document.createElement("input");
+            centralRadio.type = "radio";
+            centralRadio.name = "central-ingredient";
+            centralRadio.value = grocery;
+            centralRadio.id = `central-${index}`;
+            centralLabel.appendChild(centralRadio);
+            centralLabel.append(grocery);
+
+            const otherLabel = document.createElement("label");
+            const otherCheckbox = document.createElement("input");
+            otherCheckbox.type = "checkbox";
+            otherCheckbox.name = "other-ingredients";
+            otherCheckbox.value = grocery;
+            otherCheckbox.id = `other-${index}`;
+            otherLabel.appendChild(otherCheckbox);
+            otherLabel.append(grocery);
+
+            centralIngredientOptions.appendChild(centralLabel);
+            otherIngredientsOptions.appendChild(otherLabel);
+          });
+        }
+
+        createRecipeForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const recipeName = document
+            .getElementById("recipe-name")
+            .value.trim();
+          const typeOfDish = document.getElementById("type-of-dish").value;
+          const centralIngredient = document.querySelector(
+            "input[name='central-ingredient']:checked"
+          )?.value;
+          const otherIngredients = Array.from(
+            document.querySelectorAll("input[name='other-ingredients']:checked")
+          ).map((checkbox) => checkbox.value);
+          const recipeLink = document
+            .getElementById("recipe-link")
+            .value.trim();
+
+          if (!recipeName || !typeOfDish || !centralIngredient) {
+            alert("Please fill in all required fields.");
+            return;
+          }
+
+          const newRecipe = {
+            name: recipeName,
+            typeOfDish,
+            centralIngredient,
+            otherIngredients,
+            recipeLink: recipeLink || null,
+          };
+
+          const recipes = JSON.parse(localStorage.getItem("recipes")) || [];
+          recipes.push(newRecipe);
+          localStorage.setItem("recipes", JSON.stringify(recipes));
+          alert("Recipe added successfully!");
+          createRecipeForm.reset();
+        });
+
+        loadGroceries();
+      });
+    </script>
+  </body>
+</html>

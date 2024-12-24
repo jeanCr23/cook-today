@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Sauce</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+CO+Guides&family=Playwrite+DE+VA+Guides&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: antiquewhite;
+        font-family: Rockwell;
+      }
+      h1 {
+        text-align: center;
+        font-family: "Playwrite CO Guides", serif;
+        font-weight: 400;
+        font-style: normal;
+        margin: 20px 0;
+        color: #0d105c;
+      }
+      /* Banner styling */
+      .banner {
+        background-color: #f5f3dc; /* Adjust to your desired color */
+        color: #fff; /* Ensure the text is visible against the background */
+        padding: 20px 0; /* Add space around the text */
+        text-align: center; /* Center-align the text */
+        border-radius: 10px; /* Optional: Add rounded corners */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+        margin-bottom: 20px; /* Add spacing below the banner */
+      }
+
+      .banner h1 {
+        margin: 0; /* Remove default margin */
+        font-size: 2em; /* Adjust text size as needed */
+        font-family: "Playwrite CO Guides", serif; /* Match existing font styles */
+      }
+      #add-sauce {
+        background-color: #e07b39;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="banner">
+      <h1>Add a Sauce 🫙</h1>
+    </header>
+
+    <form id="add-sauce-form">
+      <label for="sauce-name">Sauce Name:</label>
+      <input
+        type="text"
+        id="sauce-name"
+        placeholder="Enter sauce name"
+        required
+      />
+      <br />
+
+      <label for="sauce-recipe">Sauce Recipe:</label>
+      <textarea
+        id="sauce-recipe"
+        placeholder="Write the recipe here"
+        rows="5"
+        required
+      ></textarea>
+      <br />
+
+      <label for="sauce-link">Optional Recipe Link:</label>
+      <input
+        type="url"
+        id="sauce-link"
+        placeholder="Enter link to the recipe (if any)"
+      />
+      <br />
+
+      <button type="submit" id="add-sauce">Add Sauce</button>
+    </form>
+
+    <a href="index.html"><button>Back to Home</button></a>
+
+    <script>
+      document
+        .getElementById("add-sauce-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // Get form values
+          const sauceName = document.getElementById("sauce-name").value.trim();
+          const sauceRecipe = document
+            .getElementById("sauce-recipe")
+            .value.trim();
+          const sauceLink = document.getElementById("sauce-link").value.trim();
+
+          if (sauceName && sauceRecipe) {
+            // Get existing sauces from localStorage or initialize empty array
+            const sauces = JSON.parse(localStorage.getItem("sauces")) || [];
+
+            // Create a new sauce object
+            const newSauce = {
+              name: sauceName,
+              recipe: sauceRecipe,
+              link: sauceLink || null, // Add link if provided
+            };
+
+            // Add new sauce to the array
+            sauces.push(newSauce);
+
+            // Save updated sauces array to localStorage
+            localStorage.setItem("sauces", JSON.stringify(sauces));
+
+            // Clear the form
+            document.getElementById("add-sauce-form").reset();
+
+            alert("Sauce added successfully!");
+          } else {
+            alert("Please fill out all required fields.");
+          }
+        });
+    </script>
+  </body>
+</html>

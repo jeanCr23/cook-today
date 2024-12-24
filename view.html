@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View All Recipes and Sauces</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+CO+Guides&family=Playwrite+DE+VA+Guides&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: antiquewhite;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+      }
+      /* Banner styling */
+      .banner {
+        background-color: #f5f5dc; /* Adjust to your desired color */
+        color: #fff; /* Ensure the text is visible against the background */
+        padding: 20px 0; /* Add space around the text */
+        text-align: center; /* Center-align the text */
+        border-radius: 10px; /* Optional: Add rounded corners */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+        margin-bottom: 20px; /* Add spacing below the banner */
+      }
+
+      .banner h1 {
+        margin: 0; /* Remove default margin */
+        font-size: 2em; /* Adjust text size as needed */
+        font-family: "Playwrite CO Guides", serif; /* Match existing font styles */
+      }
+      h2 {
+        font-family: Rockwell;
+      }
+      ul li {
+        background-color: #dce4c9;
+      }
+      #edit-btn {
+        background-color: #45cbe3;
+      }
+      #delete-btn {
+        background-color: rgb(220, 111, 111);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="banner">
+      <h1>All Recipes and Sauces 🍱</h1>
+    </header>
+    <section>
+      <h2>Main Dishes</h2>
+      <ul id="main-dishes">
+        <!-- Main dishes will be listed here -->
+      </ul>
+    </section>
+
+    <section>
+      <h2>Side Dishes</h2>
+      <ul id="side-dishes">
+        <!-- Side dishes will be listed here -->
+      </ul>
+    </section>
+
+    <section>
+      <h2>Snacks/Desserts/Breakfast Items</h2>
+      <ul id="snacks-desserts-breakfast">
+        <!-- Snacks/Desserts/Breakfast items will be listed here -->
+      </ul>
+    </section>
+
+    <section>
+      <h2>Sauces</h2>
+      <ul id="sauces">
+        <!-- Sauces will be listed here -->
+      </ul>
+    </section>
+
+    <a href="index.html"><button>Back to Home</button></a>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const mainDishesList = document.getElementById("main-dishes");
+        const sideDishesList = document.getElementById("side-dishes");
+        const snacksDessertsBreakfastList = document.getElementById(
+          "snacks-desserts-breakfast"
+        );
+        const saucesList = document.getElementById("sauces");
+
+        // Load recipes and sauces from localStorage
+        const recipes = JSON.parse(localStorage.getItem("recipes")) || [];
+        const sauces = JSON.parse(localStorage.getItem("sauces")) || [];
+
+        // Helper function to update localStorage and refresh the page
+        function updateLocalStorageAndRefresh(key, data) {
+          localStorage.setItem(key, JSON.stringify(data));
+          location.reload(); // Refresh to show changes
+        }
+
+        // Helper function to create a list item for a recipe
+        function createRecipeListItem(recipe, index) {
+          const listItem = document.createElement("li");
+          listItem.innerHTML = `
+              <strong>${recipe.name}</strong><br />
+              Central Ingredient: ${recipe.centralIngredient}<br />
+              Other Ingredients: ${recipe.otherIngredients.join(", ")}<br />
+              ${
+                recipe.recipeLink
+                  ? `<a href="${recipe.recipeLink}" target="_blank">View Recipe</a>`
+                  : "No link provided"
+              }
+              <br />
+              <button onclick="editRecipe(${index})", id="edit-btn">Edit</button>
+              <button onclick="deleteRecipe(${index})", id="delete-btn">Delete</button>
+            `;
+          return listItem;
+        }
+
+        // Helper function to create a list item for a sauce
+        function createSauceListItem(sauce, index) {
+          const listItem = document.createElement("li");
+          listItem.innerHTML = `
+              <strong>${sauce.name}</strong><br />
+              Recipe: ${sauce.recipe || "No recipe provided"}<br />
+              ${
+                sauce.link
+                  ? `<a href="${sauce.link}" target="_blank">View Sauce Recipe</a>`
+                  : "No link provided"
+              }
+              <br />
+              <button onclick="editSauce(${index})", id="edit-btn">Edit</button>
+              <button onclick="deleteSauce(${index})", id="delete-btn">Delete</button>
+            `;
+          return listItem;
+        }
+
+        // Populate recipes into respective sections
+        recipes.forEach((recipe, index) => {
+          const listItem = createRecipeListItem(recipe, index);
+
+          if (recipe.typeOfDish === "Main Dish") {
+            mainDishesList.appendChild(listItem);
+          } else if (recipe.typeOfDish === "Side Dish") {
+            sideDishesList.appendChild(listItem);
+          } else if (recipe.typeOfDish === "Snack/Dessert/Breakfast") {
+            snacksDessertsBreakfastList.appendChild(listItem);
+          }
+        });
+
+        // Populate sauces
+        sauces.forEach((sauce, index) => {
+          const listItem = createSauceListItem(sauce, index);
+          saucesList.appendChild(listItem);
+        });
+
+        // Display message if no recipes or sauces are found
+        if (recipes.length === 0) {
+          mainDishesList.innerHTML = "<li>No recipes found.</li>";
+          sideDishesList.innerHTML = "<li>No recipes found.</li>";
+          snacksDessertsBreakfastList.innerHTML = "<li>No recipes found.</li>";
+        }
+
+        if (sauces.length === 0) {
+          saucesList.innerHTML = "<li>No sauces found.</li>";
+        }
+
+        // Edit and delete functions
+        window.editRecipe = function (index) {
+          const recipe = recipes[index];
+          const newName = prompt("Edit Recipe Name:", recipe.name);
+          const newLink = prompt(
+            "Edit Recipe Link (leave blank if none):",
+            recipe.recipeLink || ""
+          );
+
+          if (newName) {
+            recipe.name = newName;
+            recipe.recipeLink = newLink || null;
+            updateLocalStorageAndRefresh("recipes", recipes);
+          }
+        };
+
+        window.deleteRecipe = function (index) {
+          if (confirm("Are you sure you want to delete this recipe?")) {
+            recipes.splice(index, 1);
+            updateLocalStorageAndRefresh("recipes", recipes);
+          }
+        };
+
+        window.editSauce = function (index) {
+          const sauce = sauces[index];
+          const newName = prompt("Edit Sauce Name:", sauce.name);
+          const newRecipe = prompt("Edit Sauce Recipe:", sauce.recipe);
+          const newLink = prompt(
+            "Edit Recipe Link (leave blank if none):",
+            sauce.link || ""
+          );
+
+          if (newName && newRecipe) {
+            sauce.name = newName;
+            sauce.recipe = newRecipe;
+            sauce.link = newLink || null;
+            updateLocalStorageAndRefresh("sauces", sauces);
+          }
+        };
+
+        window.deleteSauce = function (index) {
+          if (confirm("Are you sure you want to delete this sauce?")) {
+            sauces.splice(index, 1);
+            updateLocalStorageAndRefresh("sauces", sauces);
+          }
+        };
+      });
+    </script>
+  </body>
+</html>
